@@ -22,5 +22,8 @@ Route::middleware('auth:api')->post('/requests', 'RequestController@store');
 
 Route::middleware('auth:api')->get('/requests', 'RequestController@index');
 
+Route::middleware('auth:api')->put('/requests/{id}', 'RequestController@update');
+
+
 
 

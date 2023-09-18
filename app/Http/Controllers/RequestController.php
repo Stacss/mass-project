@@ -58,4 +58,42 @@ class RequestController extends Controller
         return response()->json(['requests' => $requests]);
     }
 
+    /**
+     * Обновляет заявку, устанавливая статус "Завершено" и добавляя комментарий.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
+    {
+        // Проверка наличия заявки с указанным ID
+        $task = ApiRequest::find($id);
+
+
+        if (!$task) {
+            return response()->json(['error' => 'Заявка не найдена'], 404);
+        }
+
+        // Валидация данных запроса
+        $validator = Validator::make($request->all(), [
+            'comment' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors(), 'mes' => $request->all()->toArray()], 400);
+        }
+
+        // Обновление статуса и добавление комментария
+        $task->update([
+            'status' => 'Resolved', // Устанавливаем статус "Завершено"
+            'comment' => $request->input('comment'), // Присваиваем комментарий
+        ]);
+
+        // Отправка уведомления на email пользователя (необходимо реализовать)
+
+        return response()->json(['message' => 'Заявка успешно обновлена'], 200);
+    }
+
+
 }
