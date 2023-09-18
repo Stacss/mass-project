@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
-
 class RequestController extends Controller
 {
     /**
@@ -20,14 +19,14 @@ class RequestController extends Controller
      */
     public function store(Request $request)
     {
-        // Проверка входных данных на валидность
+        // Валидация входных данных
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'message' => 'required|string',
         ]);
 
-        // Если входные данные не прошли валидацию, вернуть ошибку с кодом 400 (Bad Request)
+        // Если валидация не пройдена, вернуть ошибку с кодом 400
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 400);
         }
@@ -40,12 +39,12 @@ class RequestController extends Controller
             'message' => $request->input('message'),
         ]);
 
-        // Вернуть успешный ответ с кодом 201 (Created) и сообщением о создании заявки
+        // Вернуть успешный ответ с кодом 201 и сообщением о создании заявки
         return response()->json(['message' => 'Заявка успешно создана', 'request' => $newRequest], 201);
     }
 
     /**
-     * Получает список заявок с возможностью фильтрации по статусу.
+     * Получает список заявок с возможностью фильтрации по статусу и дате создания.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
@@ -95,7 +94,6 @@ class RequestController extends Controller
         // Проверка наличия заявки с указанным ID
         $task = ApiRequest::find($id);
 
-
         if (!$task) {
             return response()->json(['error' => 'Заявка не найдена'], 404);
         }
@@ -112,7 +110,7 @@ class RequestController extends Controller
         // Обновление статуса и добавление комментария
         $task->update([
             'status' => 'Resolved', // Устанавливаем статус "Завершено"
-            'comment' => $request->comment, // Присваиваем комментарий
+            'comment' => $request->comment,
         ]);
 
         // Отправка уведомления на email пользователя
@@ -120,6 +118,4 @@ class RequestController extends Controller
 
         return response()->json(['message' => 'Заявка успешно обновлена'], 200);
     }
-
-
 }
