@@ -40,4 +40,22 @@ class RequestController extends Controller
         // Вернуть успешный ответ с кодом 201 (Created) и сообщением о создании заявки
         return response()->json(['message' => 'Заявка успешно создана', 'request' => $newRequest], 201);
     }
+
+    /**
+     * Получает список заявок с возможностью фильтрации по статусу.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(Request $request)
+    {
+        // Получение параметра 'status' из запроса для фильтрации по статусу
+        $status = $request->input('status');
+
+        // Получение списка заявок с учетом фильтрации, если статус указан
+        $requests = $status ? ApiRequest::where('status', $status)->get() : ApiRequest::all();
+
+        return response()->json(['requests' => $requests]);
+    }
+
 }
