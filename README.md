@@ -1,61 +1,213 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+# Инструкция по установке и использованию приложения Mass Project
 
-## About Laravel
+## Установка приложения на другом сервере
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. Склонируйте репозиторий с GitHub на сервере:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```shell
+git clone https://github.com/Stacss/mass-project.git
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. Перейдите в директорию проекта:
 
-## Learning Laravel
+```shell
+cd mass-project
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. Установите все зависимости, выполнив команду:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```shell
+composer install
+```
 
-## Laravel Sponsors
+4. Скопируйте файл `.env.example` в `.env`:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```shell
+cp .env.example .env
+```
 
-### Premium Partners
+5. В файле `.env` настройте параметры подключения к базе данных и другие конфигурационные параметры.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+6. Сгенерируйте ключ приложения:
 
-## Contributing
+```shell
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+7. Выполните миграции для создания структуры базы данных:
 
-## Code of Conduct
+```shell
+php artisan migrate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+8. Запустите встроенный сервер Laravel:
 
-## Security Vulnerabilities
+```shell
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Приложение будет доступно по адресу [http://localhost:8000](http://localhost:8000).
 
-## License
+## Добавление пользователей через php artisan tinker
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Запустите командную оболочку Tinker:
+
+```shell
+php artisan tinker
+```
+
+2. Добавьте нового пользователя, заменив значения по вашему выбору:
+
+```shell
+$user = new User;
+$user->name = 'Masha';
+$user->email = 'Masha@mail.ru';
+$user->password = bcrypt('123456789'); 
+$user->save();
+```
+
+3. Выйдите из Tinker:
+
+```shell
+exit
+```
+
+## Генерация токена входа в API
+
+1. Для генерации токена API, необходимо перейти на :
+```shell
+you-domain/create-token
+```
+Ввести id пользователя и название Токена, после отправки формы будет показан Токен для работы с API. Внимание, Токен будет показан только один раз, необходимо его сохранить в безопасном месте.
+
+## Работа с API
+
+### Создание новой заявки
+
+Чтобы создать новую заявку, выполните POST-запрос на следующем адресе:
+
+```shell
+POST you-domain/api/requests
+```
+В заголовке необходимо передать
+```shell
+Accept:application/json
+Authorization:Bearer ТокенAPI
+```
+
+В теле запроса укажите следующие параметры:
+
+- `name`: имя пользователя (строка, обязательный);
+- `email`: адрес электронной почты (строка, обязательный);
+- `message`: сообщение (строка, обязательный).
+
+Пример тела запроса
+```shell
+{
+  "name": "Имя",
+  "email": "Name@example.com",
+  "message": "Текст сообщения"
+}
+```
+При удачном запросе, вернется код ответа 201 и тело
+```shell
+{
+    "message": "Заявка успешно создана",
+    "request": {
+        "name": "Имя",
+        "email": "name@example.com",
+        "status": "Active",
+        "message": "Текст запроса",
+        "updated_at": "2023-09-18T17:23:00.000000Z",
+        "created_at": "2023-09-18T17:23:00.000000Z",
+        "id": 8
+    }
+}
+```
+
+Коды ошибок:
+- 400 - ошибка валидации;
+- 401 - ошибка аутентификации
+
+### Получение списка заявок с фильтрацией
+
+Чтобы получить список заявок с возможностью фильтрации по статусу и дате создания, выполните GET-запрос на следующем адресе:
+
+```shell
+GET you-domain/api/requests
+```
+
+Вы можете использовать следующие параметры запроса:
+
+- `status`: статус заявки для фильтрации (строка, необязательный). Принимает параметры Active, Resolved;
+- `start_date`: начальная дата диапазона (строка, необязательный). Принимает дату в формате 2023-09-19;
+- `end_date`: конечная дата диапазона (строка, необязательный). Принимает дату в формате 2023-09-19.
+
+Пример запроса
+```shell
+http://you-domain/api/requests?start_date=2023-09-01&end_date=2023-09-19&status=Active
+```
+Пример ответа, код ответа 200
+```shell
+{
+    "requests": [
+        {
+            "id": 2,
+            "name": "Василий",
+            "email": "vasya@example.com",
+            "status": "Active",
+            "message": "Hello!",
+            "comment": null,
+            "created_at": "2023-09-18T12:16:39.000000Z",
+            "updated_at": "2023-09-18T12:16:39.000000Z"
+        },
+        {
+            "id": 4,
+            "name": "Nikolos",
+            "email": "Nikolos@example.com",
+            "status": "Active",
+            "message": "Текст заявки!",
+            "comment": null,
+            "created_at": "2023-09-18T13:03:05.000000Z",
+            "updated_at": "2023-09-18T13:03:05.000000Z"
+        }
+    ]
+}
+```
+
+
+### Обновление заявки
+
+Чтобы обновить заявку, установить ей статус "Завершено" и добавить комментарий, выполните PUT-запрос на следующем адресе, где `{id}` - идентификатор заявки:
+
+```shell
+PUT domain.com/api/requests/{id}
+```
+
+В заголовке необходимо передать
+```shell
+Accept:application/json
+Authorization:Bearer ТокенAPI
+```
+
+В теле запроса укажите следующие параметры:
+
+- `comment`: комментарий (строка, обязательный).
+
+Пример тела запроса
+```shell
+{
+	"comment": "заявка рассмотрена!"
+}
+```
+Пример ответа, код 200
+```shell
+{
+    "message": "Заявка успешно обновлена"
+}
+```
+Коды ошибок:
+- 404 - заявка не найдена
+- 400 - ошибка валидации запроса
+- 401 - ошибка аутентификации
