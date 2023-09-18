@@ -13,5 +13,8 @@ class ApiRequest extends Model
         'message',
         'comment',
         'created_at',
-        'updated_at'];
+        'updated_at'
+    ];
+
+    protected $table = 'api_requests';
 }
