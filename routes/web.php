@@ -16,3 +16,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/create-token', 'TokenController@create')->name('create.token');
+
+Route::post('/store-token', 'TokenController@store')->name('store.token');
+
+
+
