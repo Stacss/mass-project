@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\ApiRequest;
+use App\Mail\CommentNotification;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -52,8 +55,30 @@ class RequestController extends Controller
         // Получение параметра 'status' из запроса для фильтрации по статусу
         $status = $request->input('status');
 
-        // Получение списка заявок с учетом фильтрации, если статус указан
-        $requests = $status ? ApiRequest::where('status', $status)->get() : ApiRequest::all();
+        // Получение параметров 'start_date' и 'end_date' из запроса
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Создание запроса для фильтрации по дате
+        $query = ApiRequest::query();
+
+        // Применение фильтра по статусу, если статус указан
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        // Применение фильтра по дате, если даты указаны
+        if ($startDate && $endDate) {
+            // Преобразование дат в объекты Carbon для правильной фильтрации
+            $startDate = Carbon::parse($startDate);
+            $endDate = Carbon::parse($endDate);
+
+            // Фильтрация по диапазону дат
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        // Получение списка заявок с учетом фильтрации
+        $requests = $query->get();
 
         return response()->json(['requests' => $requests]);
     }
@@ -81,16 +106,17 @@ class RequestController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors(), 'mes' => $request->all()->toArray()], 400);
+            return response()->json(['error' => $validator->errors()], 400);
         }
 
         // Обновление статуса и добавление комментария
         $task->update([
             'status' => 'Resolved', // Устанавливаем статус "Завершено"
-            'comment' => $request->input('comment'), // Присваиваем комментарий
+            'comment' => $request->comment, // Присваиваем комментарий
         ]);
 
-        // Отправка уведомления на email пользователя (необходимо реализовать)
+        // Отправка уведомления на email пользователя
+        Mail::to($task->email)->send(new CommentNotification($request->comment));
 
         return response()->json(['message' => 'Заявка успешно обновлена'], 200);
     }
