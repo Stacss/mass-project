@@ -144,6 +144,13 @@ GET you-domain/api/requests
 - `start_date`: начальная дата диапазона (строка, необязательный). Принимает дату в формате 2023-09-19;
 - `end_date`: конечная дата диапазона (строка, необязательный). Принимает дату в формате 2023-09-19.
 
+В заголовке необходимо передать
+```shell
+Accept:application/json
+Authorization:Bearer ТокенAPI
+```
+
+
 Пример запроса
 ```shell
 http://you-domain/api/requests?start_date=2023-09-01&end_date=2023-09-19&status=Active
